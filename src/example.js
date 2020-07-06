@@ -3,7 +3,7 @@
 const path = require("path")
 const log = console.log
 
-import { pdf2js } from "./index";
+import { pdf2json } from "./index";
 
 let bpath = '../test/text-only.pdf'
 // bpath = '../test/images.pdf'
@@ -14,9 +14,10 @@ bpath = path.resolve(__dirname, bpath)
 log('RUN: BPATH', bpath)
 
 
-pdf2js(bpath)
+pdf2json(bpath)
   .then(res=> {
     log('_B-res', res)
+    if (!res) return
     if (!res.docs) return
     log(res.docs.slice(-1))
     log('_docs', res.docs.length)

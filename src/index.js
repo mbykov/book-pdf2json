@@ -19,7 +19,6 @@ export function pdf2json(bpath) {
     pdfParser.on("pdfParser_dataError", function(evtData) {
       log('____ERR-2')
     })
-    log('_pdf:_', bpath)
     pdfParser.loadPDF(bpath)
   })
 

@@ -13,7 +13,6 @@ let bpath = '../test/text-only.pdf'
 bpath = path.resolve(__dirname, bpath)
 log('RUN: BPATH', bpath)
 
-
 pdf2json(bpath)
   .then(res=> {
     log('_B-res', res)

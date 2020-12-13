@@ -16,19 +16,20 @@ export function pdf2json(bpath) {
       let str = pdfParser.getRawTextContent()
       str = str.replace(/\r/g, '')
       let rows = str.split('\n')
-      let pages = [], page = []
+      let pages = [], page = [], clean
       rows.forEach(row=> {
         if (/Page.*Break/.test(row)) {
           if (page.length) pages.push(page)
           page = []
         } else {
-          page.push(row.trim())
+          clean = cleanStr(row.trim())
+          page.push(clean)
         }
       })
       let res = pages.slice(100, 110)
 
       // remove colons as digit only:
-      let cleans = [], clean
+      let cleans = []
       for (let page of pages) {
         if (/^\d+$/.test(page[0])) clean = page.slice(1)
         if (/^\d+$/.test(page[page.length-1])) clean = page.slice(0, -1)
@@ -59,41 +60,12 @@ export function pdf2json(bpath) {
         pages = cleans
       }
       let strs = _.flatten(pages)
-      // Paracelsus
-      resolve(strs)
+      let text = strs.join('\n')
+
+      let pars = breakRow(text)
+      resolve(pars)
       return
 
-
-
-      // let docs = []
-      // let text = []
-      // let skip = 2
-      // let doc, old
-      // rows.forEach((row, idx)=> {
-      //   if (/Page.*Break/.test(row)) return
-      //   row = row.replace('\r', '').trim()
-      //   log('_R:', skip, JSON.stringify(row))
-      //   if (row) text.push(row)
-      //   if (!row) {skip++; return}
-      //   if (skip > 0) {
-      //     doc = {idx: idx, md: text.join(' ')}
-      //     docs.push(doc)
-      //     text = []
-      //   }
-      //   if (skip > 1) {
-      //     doc.level = 1
-      //   }
-      //   skip = 0
-      //   old = doc
-      // })
-
-      // if (text.length) {
-      //   doc = {last: true, idx: docs.length, md: text.join(' ')}
-      //   // docs.push(doc)
-      // }
-      // let info = {author: 'author', title: 'title', lang: 'lang'}
-      // let result = {info: info, docs: docs}
-      // resolve(result)
     })
     pdfParser.on("pdfParser_dataError", function(evtData) {
       log('____ERR:')
@@ -102,9 +74,10 @@ export function pdf2json(bpath) {
   })
 }
 
-function cleanText(str) {
+function cleanStr(str) {
   if (!str) return ''
-  let clean = str.replace(/\s\s+/g, ' ')
+  let clean = str.trim().replace(/\s\s+/g, ' ')
+  clean = clean.replace(/“/g, '"').replace(/”/g, '"')
   return clean
 }
 
@@ -115,4 +88,17 @@ function guessLang(docs) {
 
 function countInArray(array, value) {
   return array.reduce((n, x) => n + (x === value), 0);
+}
+
+function breakRow(row) {
+  row = row.replace(/\"\n\"/g, '"BREAK"')
+  row = row.replace(/([A-Z])\n([A-Z])/g, "$1BREAK$2")
+  row = row.replace(/\.\n\"/g, '.BREAK"').replace(/\?\n\"/g, '?BREAK"')
+  row = row.replace(/\"\n([A-Z])/g, "\"BREAK$1")
+  row = row.replace(/\.\n([A-Z])/g, ".BREAK$1")
+  row = row.replace(/\?\n([A-Z])/g, "?BREAK$1")
+  row = row.replace(/\n/g, " ")
+  let strs = row.split('BREAK')
+  // return row
+  return strs
 }

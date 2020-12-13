@@ -22,17 +22,21 @@ export function pdf2json(bpath) {
           if (page.length) pages.push(page)
           page = []
         } else {
-          clean = cleanStr(row.trim())
+          clean = row.trim()
+          if (!clean) return
+          clean = cleanStr(clean)
           page.push(clean)
         }
       })
-      // let res = pages.slice(100, 110)
+      // pages = pages.slice(68, 71)
 
-      // remove colons as digit only:
-      let cleans = []
+      // remove digit only colons:
+      let cleans = [], test
       for (let page of pages) {
-        if (/^\d+$/.test(page[0])) page = page.slice(1)
-        if (/^\d+$/.test(page[page.length-1])) page = page.slice(0, -1)
+        test = page[0].replace(/-/g, '').trim()
+        if (/^\d+$/.test(test)) page = page.slice(1)
+        test = page[page.length-1].replace(/-/g, '').trim()
+        if (/^\d+$/.test(test)) page = page.slice(0, -1)
         cleans.push(page)
       }
       // log('_P', cleans)
@@ -78,7 +82,7 @@ export function pdf2json(bpath) {
 function cleanStr(str) {
   if (!str) return ''
   let clean = str.trim().replace(/\s\s+/g, ' ')
-  clean = clean.replace(/“/g, '"').replace(/”/g, '"')
+  clean = clean.replace(/“/g, '"').replace(/”/g, '"').replace(/»/g, '"').replace(/«/g, '"')
   return clean
 }
 

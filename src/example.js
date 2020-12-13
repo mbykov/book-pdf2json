@@ -5,16 +5,17 @@ const log = console.log
 
 import { pdf2json } from "./index";
 
-let bpath = '../test/text-only.pdf'
-// bpath = '../test/images.pdf'
-bpath = '../test/lakatos.pdf'
-// bpath = '../test/bofre.pdf'
-bpath = '../test/warriors.pdf'
-// bpath = '../test/typescript.pdf'
-bpath = '../test/the name of the rose.pdf'
+let bpath = 'text-only.pdf'
+// bpath = 'images.pdf'
+bpath = 'lakatos.pdf'
+// bpath = 'bofre.pdf'
+bpath = 'warriors.pdf'
+// bpath = 'typescript.pdf'
+bpath = 'the name of the rose.pdf'
+bpath = '05.Harry Potter und der Orden des Phönix.pdf'
+bpath = '1984.pdf'
 
-
-bpath = path.resolve(__dirname, bpath)
+bpath = path.resolve(__dirname, '../test/', bpath)
 log('RUN BPATH:', bpath)
 
 pdf2json(bpath)

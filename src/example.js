@@ -12,8 +12,8 @@ bpath = 'lakatos.pdf'
 bpath = 'warriors.pdf'
 // bpath = 'typescript.pdf'
 bpath = 'the name of the rose.pdf'
-bpath = '05.Harry Potter und der Orden des Phönix.pdf'
-bpath = '1984.pdf'
+// bpath = '05.Harry Potter und der Orden des Phönix.pdf'
+// bpath = '1984.pdf'
 
 bpath = path.resolve(__dirname, '../test/', bpath)
 log('RUN BPATH:', bpath)

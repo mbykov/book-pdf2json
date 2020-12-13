@@ -39,14 +39,13 @@ export function pdf2json(bpath) {
         if (/^\d+$/.test(test)) page = page.slice(0, -1)
         cleans.push(page)
       }
-      // log('_P', cleans)
 
       // remove possible colons:
       let has_colon = false
       let singles = cleans.map(page=> page[0])
       let uniq = _.uniq(singles)
       if (singles.length/uniq.length > 10) has_colon = true
-      log('_HAS_COLON_', singles.length, uniq.length, has_colon)
+      // log('_HAS_COLON_', singles.length, uniq.length, has_colon)
       let freqs = []
       if (has_colon) {
         for (let colon of uniq) {
@@ -54,7 +53,6 @@ export function pdf2json(bpath) {
         }
         let max = _.max(freqs, 'freq')
         let colon = max.colon
-        log('_COLON', colon)
 
         pages = []
         for (let clean of cleans) {

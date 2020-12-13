@@ -26,15 +26,16 @@ export function pdf2json(bpath) {
           page.push(clean)
         }
       })
-      let res = pages.slice(100, 110)
+      // let res = pages.slice(100, 110)
 
       // remove colons as digit only:
       let cleans = []
       for (let page of pages) {
-        if (/^\d+$/.test(page[0])) clean = page.slice(1)
-        if (/^\d+$/.test(page[page.length-1])) clean = page.slice(0, -1)
-        cleans.push(clean)
+        if (/^\d+$/.test(page[0])) page = page.slice(1)
+        if (/^\d+$/.test(page[page.length-1])) page = page.slice(0, -1)
+        cleans.push(page)
       }
+      // log('_P', cleans)
 
       // remove possible colons:
       let has_colon = false

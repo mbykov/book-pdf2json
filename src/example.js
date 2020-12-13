@@ -10,7 +10,7 @@ let bpath = '../test/text-only.pdf'
 bpath = '../test/lakatos.pdf'
 // bpath = '../test/bofre.pdf'
 bpath = '../test/warriors.pdf'
-bpath = '../test/typescript.pdf'
+// bpath = '../test/typescript.pdf'
 bpath = '../test/the name of the rose.pdf'
 
 

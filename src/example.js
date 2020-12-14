@@ -2,6 +2,7 @@
 
 const path = require("path")
 const log = console.log
+const fse = require('fs-extra')
 
 import { pdf2json } from "./index";
 
@@ -19,11 +20,11 @@ bpath = path.resolve(__dirname, '../test/', bpath)
 log('RUN BPATH:', bpath)
 
 pdf2json(bpath)
-  .then(res=> {
-    res.forEach(str=> {
-      log('_', str)
-    })
-    // log('_RES-rows', res)
+  .then(mds=> {
+    let md = mds.join('\n')
+    let mdpath = bpath.replace(/\.pdf$/, '.md').replace(/ /g, '_')
+    log('_mdpath', mdpath)
+    fse.writeFileSync(mdpath, md)
 
     // if (!res) return
     // log('_B-res', res.docs.length)

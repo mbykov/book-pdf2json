@@ -1,7 +1,6 @@
 'use strict'
 
 import _ from 'lodash'
-const fse = require('fs-extra')
 const path = require("path")
 const log = console.log
 const franc = require('franc')
@@ -12,7 +11,6 @@ export function pdf2json(bpath) {
   return new Promise(function (resolve, reject) {
     let pdfParser = new PDFParser(this, 1)
     pdfParser.on("pdfParser_dataReady", function(evtData) {
-      // log('_AG', pdfParser.Agency)
       let str = pdfParser.getRawTextContent()
       str = str.replace(/\r/g, '')
       let rows = str.split('\n')
@@ -30,7 +28,7 @@ export function pdf2json(bpath) {
       })
       // pages = pages.slice(68, 71)
 
-      // remove digit only colons:
+      // remove digits-only colons:
       let cleans = [], test
       for (let page of pages) {
         test = page[0].replace(/-/g, '').trim()
@@ -62,11 +60,15 @@ export function pdf2json(bpath) {
       } else {
         pages = cleans
       }
+      pages.forEach(page=> {
+        page[0] = 'HEAD-' + page[0]
+      })
       let strs = _.flatten(pages)
       let text = strs.join('\n')
 
       let pars = breakRow(text)
-      resolve(pars)
+      let titles = pars.filter(par=> /HEAD/.test(par) && par.length < 50)
+      resolve(titles)
       return
 
     })

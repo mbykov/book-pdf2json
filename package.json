@@ -1,5 +1,5 @@
 {
-  "name": "book-pdf-to-js",
+  "name": "book-pdf2json",
   "version": "0.1.0",
   "main": "dist/index.js",
   "scripts": {
@@ -18,6 +18,7 @@
     "franc": "^5.0.0",
     "fs-extra": "^9.0.1",
     "lodash": "^4.17.16",
+    "pdf.js-extract": "^0.1.5",
     "pdf2json": "^1.2.0"
   }
 }

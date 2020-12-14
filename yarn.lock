@@ -1747,6 +1747,11 @@ path-parse@^1.0.6:
   resolved "https://registry.yarnpkg.com/path-parse/-/path-parse-1.0.6.tgz#d62dbb5679405d72c4737ec58600e9ddcf06d24c"
   integrity sha512-GSmOT2EbHrINBf9SR7CDELwlJ8AENk3Qn7OikK4nFYAu3Ote2+JYNVvkpAEQm3/TLNEJFD/xZJjzyxg3KBWOzw==
 
+pdf.js-extract@^0.1.5:
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/pdf.js-extract/-/pdf.js-extract-0.1.5.tgz#0e8652c1aefcef08e91a9f1b3c691ea43d219bf7"
+  integrity sha512-ZnudGaH5Q41FMeGKgOOCMO6Ybluxc87lB0shYYx0FliKHQLSs7YrXx6ZOu7oC+ZePyMQnTOtBK65dW0aawmB/Q==
+
 pdf2json@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/pdf2json/-/pdf2json-1.2.0.tgz#fdb395fad1d18248756cfbc758066a2f15b903bf"

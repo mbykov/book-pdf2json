@@ -7,10 +7,12 @@ const franc = require('franc')
 
 let PDFParser = require("pdf2json")
 
-export function pdf2json(bpath) {
+export async function pdf2json(bpath) {
   return new Promise(function (resolve, reject) {
     let pdfParser = new PDFParser(this, 1)
     pdfParser.on("pdfParser_dataReady", function(evtData) {
+      // let meta = pdfParser.prototype.loadMetaData ()
+      // log('__M', meta)
       let str = pdfParser.getRawTextContent()
       str = str.replace(/\r/g, '')
       let rows = str.split('\n')
@@ -68,9 +70,17 @@ export function pdf2json(bpath) {
 
       let pars = breakRow(text)
       let titles = pars.filter(par=> /HEAD/.test(par) && par.length < 50)
-      resolve(titles)
-      return
-
+      let docs = pars.map(par=> {
+        let doc = {md: par}
+        if (/HEAD/.test(par) && par.length < 50) {
+          doc.level = 2
+          doc.md = par.slice(5)
+        }
+        return doc
+      })
+      let descr = {title: 'xxx', auth: 'xxx'}
+      let res = {descr, docs, imgs: []}
+      resolve(res)
     })
     pdfParser.on("pdfParser_dataError", function(evtData) {
       log('____ERR:')

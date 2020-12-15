@@ -5,7 +5,6 @@ const path = require("path")
 const log = console.log
 const fse = require('fs-extra')
 
-
 const pdf = require("pdf-extraction");
 
 let options = {
@@ -55,22 +54,72 @@ export async function pdf2json(bpath) {
 }
 
 function parseText(str) {
-  let pages = str.split('PAGE_BREAK')
-  // pages = pages.map(page=> page.split('\n\n'))
+  str = cleanStr(str)
+  let pages = str.trim().split('PAGE_BREAK')
+  pages = pages.slice(205, 210)
   let cpages = []
-  pages.forEach(page=> {
+
+  for (let page of pages) {
+    if (!page) continue
     let pars = page.trim().replace(/ \n/g, '\n').split('\n\n')
-    log('___PAGE___', pars)
-    let cpars = _.flatten(pars.map(par=> parsePar(par)))
+    pars = pars.filter(par=> par && par.length)
+
+    // remove digits-only colons:
+    let test = pars[pars.length-1]
+    if (/^\d+$/.test(test)) pars = pars.slice(0, -1)
+    test = pars[0]
+    if (/^\d+$/.test(test)) pars = pars.slice(1)
+    pars = _.flatten(pars)
+    // page = pars.map(par=> par.split('\n'))
+    cpages.push(pars.map(par=> par.split('\n')))
+  }
+
+  pages = cpages
+
+  // remove possible colons:
+  let has_colon = false
+  let possibleheads = pages.map(page=> page[0][0])
+  let uniq = _.uniq(possibleheads)
+  if (possibleheads.length/uniq.length > 10) has_colon = true
+  // log('_HAS_COLON_', possibleheads.length, uniq.length, has_colon)
+  has_colon = true
+
+  let freqs = []
+  if (has_colon) {
+    for (let colon of uniq) {
+      freqs.push({colon, freq: countInArray(possibleheads, colon)})
+    }
+    let max = _.max(freqs, 'freq')
+    let colon = max.colon
+    // log('_COLON_', colon)
+
+    for (let page of pages) {
+      if (page[0][0] === colon) page[0] = page[0].slice(1)
+    }
+  }
+
+  pages.forEach(page=> {
+    page[0][0] = 'HEAD-' + page[0][0]
   })
-  // let docs = data.text //.slice(20000, 20001)
-  return cpages
+
+  log('___PAGES___', pages.length)
+
+  let cpars = [], row
+  for (let page of pages) {
+    for (let par of page) {
+      // log('___PAR___', par)
+      row = par.join('\n')
+      cpars.push(...breakRow(row))
+    }
+  }
+  cpars = _.flattenDeep(cpars)
+
+  let text  = cpars.join('BREAK')
+  text = text.replace(/BREAKHEAD-/, '')
+  let mds = text.split('BREAK')
+  return mds
 }
 
-function parsePar(str) {
-  // log('___PAR___', str)
-  return []
-}
 
 export async function pdf2json_(bpath) {
   return new Promise(function (resolve, reject) {
@@ -130,7 +179,7 @@ export async function pdf2json_(bpath) {
       pages.forEach(page=> {
         page[0] = 'HEAD-' + page[0]
       })
-      let strs = _.flatten(pages)
+     let strs = _.flatten(pages)
       let text = strs.join('\n')
 
       let pars = breakRow(text)
@@ -156,10 +205,11 @@ export async function pdf2json_(bpath) {
 
 function cleanStr(str) {
   if (!str) return ''
-  let clean = str.trim().replace(/\s\s+/g, ' ')
-  clean = clean.replace(/“/g, '"').replace(/”/g, '"').replace(/»/g, '"').replace(/«/g, '"')
+  // let clean = str.trim().replace(/\s\s+/g, ' ')
+  let clean = str.replace(/“/g, '"').replace(/”/g, '"').replace(/»/g, '"').replace(/«/g, '"')
   return clean
 }
+
 
 function countInArray(array, value) {
   return array.reduce((n, x) => n + (x === value), 0)

@@ -14,7 +14,7 @@ let bpath = 'text-only.pdf'
 // bpath = 'bofre.pdf'
 // bpath = 'warriors.pdf'
 // bpath = 'typescript.pdf'
-// bpath = 'the name of the rose.pdf'
+bpath = 'the name of the rose.pdf'
 // bpath = '05.Harry Potter und der Orden des Phönix.pdf'
 // bpath = '1984.pdf'
 
@@ -30,6 +30,9 @@ async function start(bpath, write) {
 
   log('_descr:', descr)
   // log('_docs:', docs)
+  docs.forEach(doc=> {
+    log('\n_doc:\n', doc)
+  })
   log('_docs:', docs.length)
   log('_imgs', imgs.length)
   // log('_slice', mds.slice(-10))

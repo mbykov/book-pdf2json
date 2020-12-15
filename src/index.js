@@ -58,13 +58,13 @@ export async function pdf2json(bpath) {
 function parseText(str) {
   str = cleanStr(str)
   let pages = str.trim().split('PAGE_BREAK')
-  // pages = pages.slice(205, 210)
+  pages = pages.slice(0, 25)
   let cpages = []
 
   for (let page of pages) {
     if (!page) continue
     let pars = page.trim().replace(/ \n/g, '\n').split('\n\n')
-    pars = pars.filter(par=> par && par.length)
+    // pars = pars.map(par=> par.trim())
 
     // remove digits-only colons:
     let test = pars[pars.length-1]
@@ -72,8 +72,15 @@ function parseText(str) {
     test = pars[0]
     if (/^\d+$/.test(test)) pars = pars.slice(1)
     pars = _.flatten(pars)
-    // page = pars.map(par=> par.split('\n'))
-    cpages.push(pars.map(par=> par.split('\n')))
+    let tmp
+    let mds = pars.map(par=> {
+      tmp = _.compact(par.trim().split('\n'))
+      tmp = tmp.map(row=> row.trim())
+      return _.compact(tmp)
+    })
+    mds = mds.filter(par=> par.length)
+    // log('_MDS', mds)
+    cpages.push(mds)
   }
 
   pages = cpages
@@ -84,10 +91,11 @@ function parseText(str) {
   let uniq = _.uniq(possibleheads)
   if (possibleheads.length/uniq.length > 10) has_colon = true
   // log('_HAS_COLON_', possibleheads.length, uniq.length, has_colon)
+
   has_colon = true
 
-  let freqs = []
   if (has_colon) {
+    let freqs = []
     for (let colon of uniq) {
       freqs.push({colon, freq: countInArray(possibleheads, colon)})
     }
@@ -99,22 +107,28 @@ function parseText(str) {
       if (page[0][0] === colon) page[0] = page[0].slice(1)
     }
   }
+  pages = pages.map(page=> {
+    return page.filter(par=> par.length)
+  })
+
+  pages = pages.filter(page=> page.length)
+  // log('___PAGES___', pages)
 
   pages.forEach(page=> {
     page[0][0] = 'HEAD-' + page[0][0]
   })
 
-  log('___PAGES___', pages.length)
 
   let cpars = [], row
   for (let page of pages) {
     for (let par of page) {
-      // log('___PAR___', par)
       row = par.join('\n')
       cpars.push(...breakRow(row))
     }
   }
   cpars = _.flattenDeep(cpars)
+
+  // log('___CPARS___', cpars)
 
   let text  = cpars.join('BREAK')
   text = text.replace(/BREAKHEAD-/, '')
@@ -122,9 +136,9 @@ function parseText(str) {
   let titles = mds.filter(par=> /HEAD/.test(par) && par.length < 50)
   let docs = mds.map(par=> {
     let doc = {md: par}
-    if (/HEAD/.test(par) && par.length < 50) {
-      doc.level = 2
+    if (/HEAD-/.test(par)) {
       doc.md = par.slice(5)
+      if (par.length < 50) doc.level = 2
     }
     return doc
   })

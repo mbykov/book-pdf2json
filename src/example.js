@@ -29,15 +29,13 @@ async function start(bpath, write) {
   }
 
   log('_descr:', descr)
-  // log('_docs:', docs)
-  docs.forEach(doc=> {
-    log('\n_doc:\n', doc)
-  })
+  // docs.forEach(doc=> {
+  //   log('\n_doc:\n', doc)
+  // })
   log('_docs:', docs.length)
   log('_imgs', imgs.length)
   // log('_slice', mds.slice(-10))
 
-  return
 
   let fns = docs.filter(doc=> doc.footnote)
   let refs = docs.filter(doc=> doc.refnote)

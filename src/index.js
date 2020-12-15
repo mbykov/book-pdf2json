@@ -44,6 +44,8 @@ export async function pdf2json(bpath) {
       // log('__data', _.keys(data));
       let descr = {title: data.info.Title, author: data.info.Author}
       let docs = parseText(data.text)
+      let title = {md: data.info.Title, level: 1}
+      docs.unshift(title)
       log('___docs', docs.length)
       let res = {descr, docs, imgs: []}
       return res
@@ -56,7 +58,7 @@ export async function pdf2json(bpath) {
 function parseText(str) {
   str = cleanStr(str)
   let pages = str.trim().split('PAGE_BREAK')
-  pages = pages.slice(205, 210)
+  // pages = pages.slice(205, 210)
   let cpages = []
 
   for (let page of pages) {
@@ -117,7 +119,17 @@ function parseText(str) {
   let text  = cpars.join('BREAK')
   text = text.replace(/BREAKHEAD-/, '')
   let mds = text.split('BREAK')
-  return mds
+  let titles = mds.filter(par=> /HEAD/.test(par) && par.length < 50)
+  let docs = mds.map(par=> {
+    let doc = {md: par}
+    if (/HEAD/.test(par) && par.length < 50) {
+      doc.level = 2
+      doc.md = par.slice(5)
+    }
+    return doc
+  })
+
+  return docs
 }
 
 
@@ -209,7 +221,6 @@ function cleanStr(str) {
   let clean = str.replace(/“/g, '"').replace(/”/g, '"').replace(/»/g, '"').replace(/«/g, '"')
   return clean
 }
-
 
 function countInArray(array, value) {
   return array.reduce((n, x) => n + (x === value), 0)

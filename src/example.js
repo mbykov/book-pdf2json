@@ -21,26 +21,6 @@ bpath = 'the name of the rose.pdf'
 bpath = path.resolve(__dirname, '../test/', bpath)
 log('RUN BPATH:', bpath)
 
-// pdf2json(bpath)
-//   .then(res=> {
-//     // log('_B-res', res.docs.length)
-//     let mdpath = bpath.replace(/\.pdf$/, '.md').replace(/ /g, '_')
-//     log('_mdpath', mdpath)
-
-//     let mds = res.docs.map(doc=> doc.md)
-//     let mdstr = mds.join('\n')
-//     fse.writeFileSync(mdpath, mdstr)
-
-//     // if (!res.docs) return
-//     // log('_LAST', res.docs.slice(-1))
-//     // res.docs.forEach(doc=> {
-//     //   if (doc.level > -1) log('_title:', doc)
-//     // })
-//   })
-//   .catch(err=> {
-//     log('_ERR', err)
-//   })
-
 async function start(bpath, write) {
   let {descr, docs, imgs} = await pdf2json(bpath)
   if (!docs) {

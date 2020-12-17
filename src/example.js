@@ -15,6 +15,8 @@ let bpath = 'text-only.pdf'
 // bpath = 'warriors.pdf'
 // bpath = 'typescript.pdf'
 bpath = 'the name of the rose.pdf'
+// bpath = 'il nome della rosa.pdf'
+
 // bpath = '05.Harry Potter und der Orden des Phönix.pdf'
 // bpath = '1984.pdf'
 

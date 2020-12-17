@@ -22,7 +22,6 @@ function render_page(pageData) {
       let lastY,
           text = "PAGE_BREAK";
       for (let item of textContent.items) {
-        // log('_I', item)
         if (lastY == item.transform[5] || !lastY) {
           text += item.str;
         } else {
@@ -41,12 +40,10 @@ export async function pdf2json(bpath) {
   let dataBuffer = fse.readFileSync(bpath)
   return pdf(dataBuffer, options)
     .then(function (data) {
-      // log('__data', _.keys(data));
       let descr = {title: data.info.Title, author: data.info.Author}
       let docs = parseText(data.text)
       let title = {md: data.info.Title, level: 1}
       docs.unshift(title)
-      log('___docs', docs.length)
       let res = {descr, docs, imgs: []}
       return res
     })
@@ -57,33 +54,26 @@ export async function pdf2json(bpath) {
 
 function parseText(str) {
   str = cleanStr(str)
-  let pages = str.trim().split('PAGE_BREAK')
-  // pages = pages.slice(0, 25)
-  let cpages = []
+  let rpages = str.trim().split('PAGE_BREAK')
+  // pages = pages.slice(10, 12)
 
-  for (let page of pages) {
-    if (!page) continue
-    let pars = page.trim().replace(/ \n/g, '\n').split('\n\n')
-    // pars = pars.map(par=> par.trim())
+  let pages = []
+  let rebreak = new RegExp('\n\n+')
+  for (let rpage of rpages) {
+    if (!rpage) continue
+    let pars = rpage.trim().replace(/ \n/g, '\n').split(rebreak)
+    pars = pars.filter(par=> par)
 
     // remove digits-only colons:
     let test = pars[pars.length-1]
     if (/^\d+$/.test(test)) pars = pars.slice(0, -1)
     test = pars[0]
     if (/^\d+$/.test(test)) pars = pars.slice(1)
-    pars = _.flatten(pars)
-    let tmp
-    let mds = pars.map(par=> {
-      tmp = _.compact(par.trim().split('\n'))
-      tmp = tmp.map(row=> row.trim())
-      return _.compact(tmp)
-    })
-    mds = mds.filter(par=> par.length)
-    // log('_MDS', mds)
-    cpages.push(mds)
-  }
 
-  pages = cpages
+    let rows = pars.map(par=> par.trim().split('\n'))
+    rows = rows.filter(row=> row)
+    if (rows.length) pages.push(rows)
+  }
 
   // remove possible colons:
   let has_colon = false
@@ -106,7 +96,7 @@ function parseText(str) {
     }
   }
 
-  //compact pages
+  // //compact pages
   pages = pages.map(page=> {
     return page.filter(par=> par.length)
   })
@@ -126,8 +116,6 @@ function parseText(str) {
   }
 
   cpars = _.flattenDeep(cpars)
-
-  // log('___CPARS___', cpars)
 
   let text  = cpars.join('BREAK')
   text = text.replace(/BREAKHEAD-/, '')

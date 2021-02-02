@@ -20,7 +20,7 @@ function render_page(pageData) {
   return pageData.getTextContent(render_options)
     .then(function (textContent) {
       let lastY,
-          text = "PAGE_BREAK";
+          text = "PAGE_BREAK\n";
       for (let item of textContent.items) {
         if (lastY == item.transform[5] || !lastY) {
           text += item.str;
@@ -37,7 +37,6 @@ function render_page(pageData) {
 }
 
 export async function pdf2json(bpath) {
-
   let dataBuffer = fse.readFileSync(bpath)
   return pdf(dataBuffer, options)
     .then(function (data) {
@@ -55,6 +54,7 @@ export async function pdf2json(bpath) {
 
 function parseText(str) {
   str = cleanStr(str)
+  log('_____DOCS', str)
   let rpages = str.trim().split('PAGE_BREAK')
 
   let pages = []
@@ -118,7 +118,7 @@ function parseText(str) {
   cpars = _.flattenDeep(cpars)
 
   let text  = cpars.join('BREAK')
-  text = text.trim().replace(/\s\s+/g, ' ')
+  // text = text.trim().replace(/\s\s+/g, ' ')
   text = text.replace(/BREAKHEAD-/, '')
   let mds = text.split('BREAK')
   let docs = mds.map(par=> {
@@ -136,7 +136,7 @@ function parseText(str) {
 function cleanStr(str) {
   if (!str) return ''
   // let clean = str.trim().replace(/\s\s+/g, ' ')
-  let clean = str.replace(/“/g, '"').replace(/”/g, '"').replace(/»/g, '"').replace(/«/g, '"').replace(/\t/g, ' ')
+  let clean = str.replace(/“/g, '"').replace(/”/g, '"').replace(/»/g, '"').replace(/«/g, '"').replace(/\t/g, ' ').replace(/ +/g, ' ')
   return clean
 }
 

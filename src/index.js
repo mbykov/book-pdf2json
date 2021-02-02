@@ -13,7 +13,7 @@ let options = {
 
 function render_page(pageData) {
   let render_options = {
-    normalizeWhitespace: false,
+    normalizeWhitespace: true,
     disableCombineTextItems: false,
   };
 
@@ -23,13 +23,13 @@ function render_page(pageData) {
           text = "PAGE_BREAK\n";
       for (let item of textContent.items) {
         if (lastY == item.transform[5] || !lastY) {
-          text += item.str;
+          text += item.str.trim();
         } else {
-          text += "\n" + item.str;
+          text += "\n" + item.str.trim();
         }
         lastY = item.transform[5];
       }
-      return text;
+      return text.trim();
     })
     .catch(err=> {
       log('_ERR-text', err)
@@ -54,12 +54,19 @@ export async function pdf2json(bpath) {
 
 function parseText(str) {
   str = cleanStr(str)
-  log('_____DOCS', str)
-  let rpages = str.trim().split('PAGE_BREAK')
-
-  let pages = []
   let rebreak = new RegExp('\n\n+')
+  str = str.replace(/ \n/g, '\n').replace(/\nPAGE_BREAK/g, 'PAGE_BREAK').trim()
+  log('_____str', str)
+
+  // PAGE_BREAK - before - . : ? " ] ! \d * ;
+  return []
+
+  let rpages = str.split('PAGE_BREAK')
+
+  let strsize = 0
+  let pages = []
   for (let rpage of rpages) {
+    rpage = rpage.trim()
     if (!rpage) continue
     let pars = rpage.trim().replace(/ \n/g, '\n').split(rebreak)
     pars = pars.filter(par=> par)
@@ -80,8 +87,7 @@ function parseText(str) {
   let possibleheads = pages.map(page=> page[0][0])
   let uniq = _.uniq(possibleheads)
   if (possibleheads.length/uniq.length > 10) has_colon = true
-
-  has_colon = true
+  // has_colon = true
 
   if (has_colon) {
     let freqs = []
@@ -106,6 +112,8 @@ function parseText(str) {
   pages.forEach(page=> {
     page[0][0] = 'HEAD-' + page[0][0]
   })
+
+  log('_____pages', pages)
 
   let cpars = [], row
   for (let page of pages) {
@@ -145,6 +153,7 @@ function countInArray(array, value) {
 }
 
 function breakRow(row) {
+  row = row.replace(/\nPAGE_BREAK/g, 'PAGE_BREAK')
   row = row.replace(/\"\n\"/g, '"BREAK"')
   row = row.replace(/([A-Z])\n([A-Z])/g, "$1BREAK$2")
   row = row.replace(/\.\n\"/g, '.BREAK"').replace(/\?\n\"/g, '?BREAK"')

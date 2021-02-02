@@ -37,6 +37,7 @@ function render_page(pageData) {
 }
 
 export async function pdf2json(bpath) {
+
   let dataBuffer = fse.readFileSync(bpath)
   return pdf(dataBuffer, options)
     .then(function (data) {
@@ -48,14 +49,13 @@ export async function pdf2json(bpath) {
       return res
     })
     .catch(err=> {
-      log('_ERR', err)
+      log('_ERR PDF', err)
     })
 }
 
 function parseText(str) {
   str = cleanStr(str)
   let rpages = str.trim().split('PAGE_BREAK')
-  // pages = pages.slice(10, 12)
 
   let pages = []
   let rebreak = new RegExp('\n\n+')
@@ -118,6 +118,7 @@ function parseText(str) {
   cpars = _.flattenDeep(cpars)
 
   let text  = cpars.join('BREAK')
+  text = text.trim().replace(/\s\s+/g, ' ')
   text = text.replace(/BREAKHEAD-/, '')
   let mds = text.split('BREAK')
   let docs = mds.map(par=> {
@@ -135,7 +136,7 @@ function parseText(str) {
 function cleanStr(str) {
   if (!str) return ''
   // let clean = str.trim().replace(/\s\s+/g, ' ')
-  let clean = str.replace(/“/g, '"').replace(/”/g, '"').replace(/»/g, '"').replace(/«/g, '"')
+  let clean = str.replace(/“/g, '"').replace(/”/g, '"').replace(/»/g, '"').replace(/«/g, '"').replace(/\t/g, ' ')
   return clean
 }
 
@@ -152,6 +153,5 @@ function breakRow(row) {
   row = row.replace(/\?\n([A-Z])/g, "?BREAK$1")
   row = row.replace(/\n/g, " ")
   let strs = row.split('BREAK')
-  // return row
   return strs
 }

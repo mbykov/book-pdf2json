@@ -55,7 +55,7 @@ export async function pdf2json(bpath) {
 function parseText(str) {
   str = cleanStr(str)
   let rebreak = new RegExp('\n\n+')
-  str = str.replace(/ \n/g, '\n').replace(/\nPAGE_BREAK/g, 'PAGE_BREAK').trim()
+  str = str.replace(/ \n/g, '\n').replace(/\n+PAGE_BREAK/g, '\nPAGE_BREAK').trim()
   log('_____str', str)
 
   // PAGE_BREAK - before - . : ? " ] ! \d * ;

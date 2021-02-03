@@ -79,36 +79,38 @@ function parseText(str) {
   let rowsize = _.round(_.sum(rows.map(row=> row.length))/rows.length)
   log('_PS', pagesize)
   log('_RS', rowsize)
-  let parbr = _.round(rowsize*0.95)
+  let parbr = _.round(rowsize*0.75)
   log('_PBR', parbr)
   pages = removeSimpleColonTitle(pages)
   pages = removeColonTitle(pages)
 
-  // log('_PAGE:', idx, JSON.stringify(page))
   let docs = []
   let parsigns = '.?:]!0123456789'.split('')
   let nonheaders = '–'.split('')
   let prev = ''
-  let doc = {mds: []}
-  pagerows.forEach(rows=> {
-    // log('_PAGE-rows:', idx, rows)
+  let doc = {}
+  let mds = []
+  pagerows.forEach((rows, idy)=> {
+    // if (idy < 4) return
+    // if (idy > 20) return
+    // log('_PAGE-rows:', idy, rows, '______end-rows')
     rows.forEach((row, idx)=> {
       if (prev.length <= parbr) {
-        // doc.mds.push(row)
-        doc.md = doc.mds.join(' ')
-        delete doc.mds
-        if (doc.md.length) docs.push(doc)
-        // if (!idx) docs.push({pb__________________: true})
-        doc = {mds: [row]}
-        if (!idx && rows.length <= rowsize/2 && row.length <= parbr/2) doc.level = 2
+        doc.md = mds.join(' ')
+        if (mds.length) docs.push(doc)
+        doc = {}
+        mds = [row]
+        // if (!idx) docs.push({pb__________________: idy})
+        if (!idx && rows.length <= pagesize/1.5 && row.length <= rowsize/2) doc.level = 2
       } else {
-        doc.mds.push(row)
+        mds.push(row)
       }
       prev = row
     })
   })
+  // docs = docs.slice(50,60)
   let headers = docs.filter(doc=> doc.level)
-  // log('_BPS', headers)
+  // log('_BPS', docs)
   return docs
 }
 

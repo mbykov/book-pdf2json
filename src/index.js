@@ -5,31 +5,32 @@ const path = require("path")
 const log = console.log
 const fse = require('fs-extra')
 
-const pdf = require("pdf-extraction");
+const pdf = require("pdf-extraction")
 
 let options = {
   pagerender: render_page,
-};
+}
 
 function render_page(pageData) {
   let render_options = {
     normalizeWhitespace: true,
     disableCombineTextItems: false,
-  };
+  }
 
   return pageData.getTextContent(render_options)
     .then(function (textContent) {
       let lastY,
-          text = "PAGE_BREAK\n";
+          text = "PAGE_BREAK\n"
+      // log('_TC', textContent.items)
       for (let item of textContent.items) {
         if (lastY == item.transform[5] || !lastY) {
-          text += item.str.trim();
+          text += item.str
         } else {
-          text += "\n" + item.str.trim();
+          text += "\n" + item.str
         }
-        lastY = item.transform[5];
+        lastY = item.transform[5]
       }
-      return text.trim();
+      return text.trim()
     })
     .catch(err=> {
       log('_ERR-text', err)
@@ -52,14 +53,56 @@ export async function pdf2json(bpath) {
     })
 }
 
+/*
+  считаю к-во строк на стр, длинну строки
+  убираю колонтитулы
+  ставлю заголовки
+
+*/
+
+function removeSimpleColonTitle(pages) {
+  return pages
+}
+
+function removeColonTitle(pages) {
+  return pages
+}
+
 function parseText(str) {
+  str = str.replace(/\n\n+/g, '\n')
+  let pages = str.split('PAGE_BREAK')
+  let pagerows = pages.map(page=> page.split('\n').map(row=> row.trim()).filter(row=> row)).filter(page=> page.length)
+
+  let testpages = pagerows.slice(25, pages.length-25)
+  let pagesize = _.round(_.sum(testpages.map(testrows=> testrows.length))/testpages.length)
+  let rows = _.flatten(testpages.map(testrows=> testrows)).filter(row=> row)
+  let rowsize = _.round(_.sum(rows.map(row=> row.length))/rows.length)
+  log('_PS', pagesize)
+  log('_RS', rowsize)
+  pages = removeSimpleColonTitle(pages)
+  pages = removeColonTitle(pages)
+
+  pagerows.forEach((page, idx)=> {
+    log('_PAGE:', idx, JSON.stringify(page))
+  })
+  return []
+}
+
+
+
+function parseText_(str) {
+  str = str.replace(/\n\n+/g, '\n')
+  // log('__str__', str)
+
+  return []
+
   str = cleanStr(str)
   let rebreak = new RegExp('\n\n+')
   str = str.replace(/ \n/g, '\n').replace(/\n+PAGE_BREAK/g, '\nPAGE_BREAK').trim()
-  log('_____str', str)
+  log('_____str', str.length)
 
   // PAGE_BREAK - before - . : ? " ] ! \d * ;
-  return []
+  // return []
 
   let rpages = str.split('PAGE_BREAK')
 
@@ -103,17 +146,23 @@ function parseText(str) {
   }
 
   // //compact pages
-  pages = pages.map(page=> {
-    return page.filter(par=> par.length)
-  })
+  // pages = pages.map(page=> {
+  //   return page.filter(par=> par.length)
+  // })
 
-  pages = pages.filter(page=> page.length)
+  pages = _.flatten(pages.filter(page=> page.length))
+
+  log('_____pages', pages)
+
+  return []
 
   pages.forEach(page=> {
     page[0][0] = 'HEAD-' + page[0][0]
   })
 
   log('_____pages', pages)
+
+  return []
 
   let cpars = [], row
   for (let page of pages) {

@@ -100,7 +100,7 @@ function parseText(str) {
         if (doc.md.length) docs.push(doc)
         // if (!idx) docs.push({pb__________________: true})
         doc = {mds: [row]}
-        if (!idx && rows.length <= 2 && row.length <= parbr/2) doc.level = 2
+        if (!idx && rows.length <= rowsize/2 && row.length <= parbr/2) doc.level = 2
       } else {
         doc.mds.push(row)
       }

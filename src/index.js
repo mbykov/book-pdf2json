@@ -79,13 +79,37 @@ function parseText(str) {
   let rowsize = _.round(_.sum(rows.map(row=> row.length))/rows.length)
   log('_PS', pagesize)
   log('_RS', rowsize)
+  let parbr = _.round(rowsize*0.95)
+  log('_PBR', parbr)
   pages = removeSimpleColonTitle(pages)
   pages = removeColonTitle(pages)
 
-  pagerows.forEach((page, idx)=> {
-    log('_PAGE:', idx, JSON.stringify(page))
+  // log('_PAGE:', idx, JSON.stringify(page))
+  let docs = []
+  let parsigns = '.?:]!0123456789'.split('')
+  let nonheaders = '–'.split('')
+  let prev = ''
+  let doc = {mds: []}
+  pagerows.forEach(rows=> {
+    // log('_PAGE-rows:', idx, rows)
+    rows.forEach((row, idx)=> {
+      if (prev.length <= parbr) {
+        // doc.mds.push(row)
+        doc.md = doc.mds.join(' ')
+        delete doc.mds
+        if (doc.md.length) docs.push(doc)
+        // if (!idx) docs.push({pb__________________: true})
+        doc = {mds: [row]}
+        if (!idx && rows.length <= 2 && row.length <= parbr/2) doc.level = 2
+      } else {
+        doc.mds.push(row)
+      }
+      prev = row
+    })
   })
-  return []
+  let headers = docs.filter(doc=> doc.level)
+  // log('_BPS', headers)
+  return docs
 }
 
 

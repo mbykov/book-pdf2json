@@ -41,9 +41,9 @@ export async function pdf2json(bpath) {
   let dataBuffer = fse.readFileSync(bpath)
   return pdf(dataBuffer, options)
     .then(function (data) {
-      let descr = {title: data.info.Title, author: data.info.Author}
+      let descr = {title: data.info.Title || 'title', author: data.info.Author || 'author'}
       let docs = parseText(data.text)
-      let title = {md: data.info.Title, level: 1}
+      let title = {md: descr.title, level: 1}
       docs.unshift(title)
       let res = {descr, docs, imgs: []}
       return res
